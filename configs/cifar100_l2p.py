@@ -75,7 +75,7 @@ def get_args_parser(subparsers):
     subparsers.add_argument('--task_inc', default=False, type=bool, help='if doing task incremental')
 
     # Prompt parameters
-    subparsers.add_argument('--prompt_pool', default=True, type=bool,)
+    subparsers.add_argument('--prompt_pool', default=False, type=bool,)
     subparsers.add_argument('--size', default=10, type=int,)
     subparsers.add_argument('--length', default=5,type=int, )
     subparsers.add_argument('--top_k', default=5, type=int, )
@@ -85,7 +85,7 @@ def get_args_parser(subparsers):
     subparsers.add_argument('--use_prompt_mask', default=False, type=bool)
     subparsers.add_argument('--shared_prompt_pool', default=False, type=bool)
     subparsers.add_argument('--shared_prompt_key', default=False, type=bool)
-    subparsers.add_argument('--batchwise_prompt', default=False, type=bool)
+    subparsers.add_argument('--batchwise_prompt', default=True, type=bool)
     subparsers.add_argument('--embedding_key', default='cls', type=str)
     subparsers.add_argument('--predefined_key', default='', type=str)
     subparsers.add_argument('--pull_constraint', default=True)

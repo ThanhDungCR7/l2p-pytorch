@@ -37,7 +37,7 @@ class Prompt(nn.Module):
         else:
             # else use mean of prompt as key
             # only compatible with prompt, not prefix
-            prompt_mean = torch.mean(self.prompt, dim=1)
+            prompt_mean = torch.mean(self.prompt.clone(), dim=1)
             self.prompt_key = prompt_mean
     
     def l2_normalize(self, x, dim=None, epsilon=1e-12):

@@ -75,7 +75,7 @@ def get_args_parser(subparsers):
     subparsers.add_argument('--task_inc', default=False, type=bool, help='if doing task incremental')
 
     # Prompt parameters
-    subparsers.add_argument('--prompt_pool', default=False, type=bool,)
+    subparsers.add_argument('--prompt_pool', default=True, type=bool,)
     subparsers.add_argument('--size', default=10, type=int,)
     subparsers.add_argument('--length', default=5,type=int, )
     subparsers.add_argument('--top_k', default=5, type=int, )

@@ -5,6 +5,7 @@ class Prompt(nn.Module):
     def __init__(self, length=5, embed_dim=768, embedding_key='mean', prompt_init='uniform', prompt_pool=False, 
                  prompt_key=False, pool_size=None, top_k=None, batchwise_prompt=False, prompt_key_init='uniform',):
         super().__init__()
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         self.length = length
         self.embed_dim = embed_dim
@@ -19,23 +20,22 @@ class Prompt(nn.Module):
         if self.prompt_pool:
             prompt_pool_shape = (pool_size, length, embed_dim)
             if prompt_init == 'zero':
-                self.prompt = nn.Parameter(torch.zeros(prompt_pool_shape))
+                self.prompt = nn.Parameter(torch.zeros(prompt_pool_shape, device=device))
             elif prompt_init == 'uniform':
-                self.prompt = nn.Parameter(torch.randn(prompt_pool_shape))
+                self.prompt = nn.Parameter(torch.randn(prompt_pool_shape, device=device))
                 nn.init.uniform_(self.prompt, -1, 1)
         
         # if using learnable prompt keys
         if prompt_key:
             key_shape = (pool_size, embed_dim)
             if prompt_key_init == 'zero':
-                self.prompt_key = nn.Parameter(torch.zeros(key_shape))
+                self.prompt_key = nn.Parameter(torch.zeros(key_shape, device=device))
             elif prompt_key_init == 'uniform':
-                self.prompt_key = nn.Parameter(torch.randn(key_shape))
-                nn.init.uniform_(self.prompt_key, -1, 1)
+                self.prompt_key = nn.Parameter(torch.randn(key_shape, device=device))
         else:
             # else use mean of prompt as key
             # only compatible with prompt, not prefix
-            prompt_mean = torch.mean(self.prompt, dim=1)
+            prompt_mean = torch.mean(self.prompt, dim=1, device=device)
             self.prompt_key = prompt_mean
     
     def l2_normalize(self, x, dim=None, epsilon=1e-12):

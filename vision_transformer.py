@@ -490,7 +490,7 @@ class VisionTransformer(nn.Module):
         #     self.total_prompt_len = res['total_prompt_len']
         #     x = res['prompted_embedding']
         # else:
-        #     res=dict() Thành Dũng
+        res=dict() #Thành Dũng
         if self.cls_token is not None:
             x = torch.cat((self.cls_token.expand(x.shape[0], -1, -1), x), dim=1)
         
@@ -502,12 +502,12 @@ class VisionTransformer(nn.Module):
             x = self.blocks(x)
         
         x = self.norm(x)
-        # res['x'] = x Thành Dũng
+        res['x'] = x #Thành Dũng
 
-        return x #Thành Dũng
+        return res #Thành Dũng
 
     def forward_head(self, res, pre_logits: bool = False):
-        # x = res['x']
+        x = res['x']
         # if self.class_token and self.head_type == 'token': Thành Dũng
         #     x = x[:, 0]
         # elif self.head_type == 'gap' and self.global_pool == 'avg':
@@ -521,13 +521,13 @@ class VisionTransformer(nn.Module):
         # else:
         #     raise ValueError(f'Invalid classifier={self.classifier}') 
         
-        # res['pre_logits'] = x
+        res['pre_logits'] = x
 
         x = self.fc_norm(x)
         # x = self.mlp(x) # thành dũng
-        x = self.head(x)
+        res['logits'] = self.head(x)
         
-        return x
+        return res
 
     # def forward(self, x, task_id=-1, cls_features=None, train=False):
     #     res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)

@@ -504,7 +504,7 @@ class VisionTransformer(nn.Module):
         x = self.norm(x)
         # res['x'] = x Thành Dũng
 
-        return res
+        return x #Thành Dũng
 
     def forward_head(self, res, pre_logits: bool = False):
         x = res['x']

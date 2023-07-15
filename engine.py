@@ -214,6 +214,12 @@ def train_and_evaluate(model: torch.nn.Module, model_without_ddp: torch.nn.Modul
                 cur_start = prev_end
                 cur_end = (task_id + 1) * args.top_k
 
+                if (prev_end > args.size) or (cur_end > args.size):
+                    pass
+                else:
+                    cur_idx = (slice(cur_start, cur_end))
+                    prev_idx = (slice(prev_start, prev_end))
+
                 with torch.no_grad():
                     if args.distributed:
                         model.module.prompt.prompt_key.grad.zero_()

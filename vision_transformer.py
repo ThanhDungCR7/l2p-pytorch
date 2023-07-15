@@ -501,7 +501,7 @@ class VisionTransformer(nn.Module):
         return logits
 
 
-    def forward(self, x, task_id=-1):
+    def forward(self, x):
         x = self.forward_features(x)
         logits = self.forward_head(x)
         return logits

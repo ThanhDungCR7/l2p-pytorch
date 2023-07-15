@@ -335,8 +335,7 @@ class VisionTransformer(nn.Module):
             class_token=True, no_embed_class=False, fc_norm=None, drop_rate=0., attn_drop_rate=0., drop_path_rate=0.,
             weight_init='', embed_layer=PatchEmbed, norm_layer=None, act_layer=None, block_fn=Block,
             prompt_length=None, embedding_key='cls', prompt_init='uniform', prompt_pool=False, prompt_key=False, pool_size=None,
-            top_k=None, batchwise_prompt=False, prompt_key_init='uniform', head_type='token', use_prompt_mask=False,
-            mlp_hidden_dim = 512, mlp_num_layers = 2,):
+            top_k=None, batchwise_prompt=False, prompt_key_init='uniform', head_type='token', use_prompt_mask=False,):
         """
         Args:
             img_size (int, tuple): input image size
@@ -392,10 +391,6 @@ class VisionTransformer(nn.Module):
         self.prompt_pool = prompt_pool
         self.head_type = head_type
         self.use_prompt_mask = use_prompt_mask
-
-
-        self.mlp_hidden_dim = mlp_hidden_dim
-        self.mlp_num_layers = mlp_num_layers
         
         if prompt_length is not None and pool_size is not None and prompt_pool: 
             self.prompt = Prompt(length=prompt_length, embed_dim=embed_dim, embedding_key=embedding_key, prompt_init=prompt_init,
@@ -412,24 +407,10 @@ class VisionTransformer(nn.Module):
 
         # Classifier Head
         self.fc_norm = norm_layer(embed_dim) if use_fc_norm else nn.Identity()
-        # self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
-
-        self.mlp = self._create_mlp(self.embed_dim, self.mlp_hidden_dim, self.mlp_num_layers) # thành dũng
-        self.head = nn.Linear(self.mlp_hidden_dim, num_classes) if num_classes > 0 else nn.Identity() # thành dũng
-
+        self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
         if weight_init != 'skip':
             self.init_weights(weight_init)
-
-
-    def _create_mlp(self, in_features, hidden_dim, num_layers): # thành dũng
-        layers = []
-        for _ in range(num_layers):
-            layers.append(nn.Linear(in_features, hidden_dim))
-            layers.append(nn.ReLU(inplace=True))
-            in_features = hidden_dim
-        return nn.Sequential(*layers)
-
 
     def init_weights(self, mode=''):
         assert mode in ('jax', 'jax_nlhb', 'moco', '')
@@ -508,7 +489,7 @@ class VisionTransformer(nn.Module):
 
     def forward_head(self, res, pre_logits: bool = False):
         x = res['x']
-        if self.class_token and self.head_type == 'token': 
+        if self.class_token and self.head_type == 'token':
             x = x[:, 0]
         elif self.head_type == 'gap' and self.global_pool == 'avg':
             x = x.mean(dim=1)
@@ -519,12 +500,12 @@ class VisionTransformer(nn.Module):
             x = x[:, 0:self.total_prompt_len + 1]
             x = x.mean(dim=1)
         else:
-            raise ValueError(f'Invalid classifier={self.classifier}') 
+            raise ValueError(f'Invalid classifier={self.classifier}')
         
         res['pre_logits'] = x
 
         x = self.fc_norm(x)
-        x = self.mlp(x) # thành dũng
+        
         res['logits'] = self.head(x)
         
         return res
@@ -533,11 +514,6 @@ class VisionTransformer(nn.Module):
         res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)
         res = self.forward_head(res)
         return res
-
-    # def forward(self, x, task_id=-1, cls_features=None): #Thành Dũng
-    #     res = self.forward_features(x, task_id=task_id, cls_features=cls_features)
-    #     res = self.forward_head(res)
-    #     return res
 
 
 def init_weights_vit_timm(module: nn.Module, name: str = ''):

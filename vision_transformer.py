@@ -485,24 +485,21 @@ class VisionTransformer(nn.Module):
         x = self.norm(x)
 
 
-        return res
+        return x
 
-    def forward_head(self, res, pre_logits: bool = False):
-
+    def forward_head(self, x):
         if self.class_token and self.head_type == 'token':
             x = x[:, 0]
         elif self.head_type == 'gap' and self.global_pool == 'avg':
             x = x.mean(dim=1)
         else:
             raise ValueError(f'Invalid classifier={self.classifier}')
-        
-        res['pre_logits'] = x
 
         x = self.fc_norm(x)
+        logits = self.head(x)
 
-        res['logits'] = self.head(x)
-        
-        return res
+        return logits
+
 
     def forward(self, x, task_id=-1):
         x = self.forward_features(x)

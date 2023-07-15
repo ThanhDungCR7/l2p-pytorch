@@ -64,9 +64,7 @@ class Prompt(nn.Module):
             prompt_norm = self.l2_normalize(self.prompt_key, dim=1) # Pool_size, C
             x_embed_norm = self.l2_normalize(x_embed_mean, dim=1) # B, C
 
-            device = torch.device(args.device)
-            x_embed_norm = x_embed_norm.to(device)
-            prompt_norm = prompt_norm.to(device)
+
             similarity = torch.matmul(x_embed_norm, prompt_norm.t()) # B, Pool_size
             
             if prompt_mask is None:

@@ -507,7 +507,7 @@ class VisionTransformer(nn.Module):
         return x #Thành Dũng
 
     def forward_head(self, res, pre_logits: bool = False):
-        x = res['x']
+        # x = res['x']
         # if self.class_token and self.head_type == 'token': Thành Dũng
         #     x = x[:, 0]
         # elif self.head_type == 'gap' and self.global_pool == 'avg':
@@ -521,13 +521,13 @@ class VisionTransformer(nn.Module):
         # else:
         #     raise ValueError(f'Invalid classifier={self.classifier}') 
         
-        res['pre_logits'] = x
+        # res['pre_logits'] = x
 
         x = self.fc_norm(x)
         # x = self.mlp(x) # thành dũng
-        res['logits'] = self.head(x)
+        x = self.head(x)
         
-        return res
+        return x
 
     # def forward(self, x, task_id=-1, cls_features=None, train=False):
     #     res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)

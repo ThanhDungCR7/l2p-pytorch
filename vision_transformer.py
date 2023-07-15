@@ -412,10 +412,10 @@ class VisionTransformer(nn.Module):
 
         # Classifier Head
         self.fc_norm = norm_layer(embed_dim) if use_fc_norm else nn.Identity()
-        # self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
+        self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
-        self.mlp = self._create_mlp(self.embed_dim, self.mlp_hidden_dim, self.mlp_num_layers) # thành dũng
-        self.head = nn.Linear(self.mlp_hidden_dim, num_classes) if num_classes > 0 else nn.Identity() # thành dũng
+        # self.mlp = self._create_mlp(self.embed_dim, self.mlp_hidden_dim, self.mlp_num_layers) # thành dũng
+        # self.head = nn.Linear(self.mlp_hidden_dim, num_classes) if num_classes > 0 else nn.Identity() # thành dũng
 
 
         if weight_init != 'skip':
@@ -476,21 +476,21 @@ class VisionTransformer(nn.Module):
     def forward_features(self, x, task_id=-1, cls_features=None, train=False):
         x = self.patch_embed(x)
 
-        if hasattr(self, 'prompt'):
-            if self.use_prompt_mask and train:
-                start = task_id * self.prompt.top_k
-                end = (task_id + 1) * self.prompt.top_k
-                single_prompt_mask = torch.arange(start, end).to(x.device)
-                prompt_mask = single_prompt_mask.unsqueeze(0).expand(x.shape[0], -1)
-                if end > self.prompt.pool_size:
-                    prompt_mask = None
-            else:
-                prompt_mask = None
-            res = self.prompt(x, prompt_mask=prompt_mask, cls_features=cls_features)
-            self.total_prompt_len = res['total_prompt_len']
-            x = res['prompted_embedding']
-        else:
-            res=dict()
+        # if hasattr(self, 'prompt'):
+        #     if self.use_prompt_mask and train:
+        #         start = task_id * self.prompt.top_k
+        #         end = (task_id + 1) * self.prompt.top_k
+        #         single_prompt_mask = torch.arange(start, end).to(x.device)
+        #         prompt_mask = single_prompt_mask.unsqueeze(0).expand(x.shape[0], -1)
+        #         if end > self.prompt.pool_size:
+        #             prompt_mask = None
+        #     else:
+        #         prompt_mask = None
+        #     res = self.prompt(x, prompt_mask=prompt_mask, cls_features=cls_features)
+        #     self.total_prompt_len = res['total_prompt_len']
+        #     x = res['prompted_embedding']
+        # else:
+        #     res=dict() Thành Dũng
         if self.cls_token is not None:
             x = torch.cat((self.cls_token.expand(x.shape[0], -1, -1), x), dim=1)
         
@@ -502,35 +502,40 @@ class VisionTransformer(nn.Module):
             x = self.blocks(x)
         
         x = self.norm(x)
-        res['x'] = x
+        # res['x'] = x Thành Dũng
 
         return res
 
     def forward_head(self, res, pre_logits: bool = False):
         x = res['x']
-        if self.class_token and self.head_type == 'token':
-            x = x[:, 0]
-        elif self.head_type == 'gap' and self.global_pool == 'avg':
-            x = x.mean(dim=1)
-        elif self.head_type == 'prompt' and self.prompt_pool:
-            x = x[:, 1:(1 + self.total_prompt_len)] if self.class_token else x[:, 0:self.total_prompt_len]
-            x = x.mean(dim=1)
-        elif self.head_type == 'token+prompt' and self.prompt_pool and self.class_token:
-            x = x[:, 0:self.total_prompt_len + 1]
-            x = x.mean(dim=1)
-        else:
-            raise ValueError(f'Invalid classifier={self.classifier}')
+        # if self.class_token and self.head_type == 'token': Thành Dũng
+        #     x = x[:, 0]
+        # elif self.head_type == 'gap' and self.global_pool == 'avg':
+        #     x = x.mean(dim=1)
+        # elif self.head_type == 'prompt' and self.prompt_pool:
+        #     x = x[:, 1:(1 + self.total_prompt_len)] if self.class_token else x[:, 0:self.total_prompt_len]
+        #     x = x.mean(dim=1)
+        # elif self.head_type == 'token+prompt' and self.prompt_pool and self.class_token:
+        #     x = x[:, 0:self.total_prompt_len + 1]
+        #     x = x.mean(dim=1)
+        # else:
+        #     raise ValueError(f'Invalid classifier={self.classifier}') 
         
         res['pre_logits'] = x
 
         x = self.fc_norm(x)
-        x = self.mlp(x) # thành dũng
+        # x = self.mlp(x) # thành dũng
         res['logits'] = self.head(x)
         
         return res
 
-    def forward(self, x, task_id=-1, cls_features=None, train=False):
-        res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)
+    # def forward(self, x, task_id=-1, cls_features=None, train=False):
+    #     res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)
+    #     res = self.forward_head(res)
+    #     return res
+
+    def forward(self, x, task_id=-1, cls_features=None): #Thành Dũng
+        res = self.forward_features(x, task_id=task_id, cls_features=cls_features)
         res = self.forward_head(res)
         return res
 

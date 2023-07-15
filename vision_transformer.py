@@ -336,7 +336,7 @@ class VisionTransformer(nn.Module):
             weight_init='', embed_layer=PatchEmbed, norm_layer=None, act_layer=None, block_fn=Block,
             prompt_length=None, embedding_key='cls', prompt_init='uniform', prompt_pool=False, prompt_key=False, pool_size=None,
             top_k=None, batchwise_prompt=False, prompt_key_init='uniform', head_type='token', use_prompt_mask=False,
-            mlp_hidden_dim = 2048, mlp_num_layers = 3,):
+            mlp_hidden_dim = 256, mlp_num_layers = 2,):
         """
         Args:
             img_size (int, tuple): input image size

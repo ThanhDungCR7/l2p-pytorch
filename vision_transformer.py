@@ -534,8 +534,8 @@ class VisionTransformer(nn.Module):
     #     res = self.forward_head(res)
     #     return res
 
-    def forward(self, x, task_id=-1, cls_features=None): #Thành Dũng
-        res = self.forward_features(x, task_id=task_id, cls_features=cls_features)
+    def forward(self, x, task_id=-1, cls_features=None,train=False): #Thành Dũng
+        res = self.forward_features(x, task_id=task_id, cls_features=cls_features, train=train)
         res = self.forward_head(res)
         return res
 

@@ -74,6 +74,7 @@ def main(args):
         head_type=args.head_type,
         use_prompt_mask=args.use_prompt_mask,
     )
+    model = original_model
     original_model.to(device)
     model.to(device)  
 

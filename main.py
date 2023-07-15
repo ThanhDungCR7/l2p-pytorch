@@ -62,19 +62,7 @@ def main(args):
         drop_rate=args.drop,
         drop_path_rate=args.drop_path,
         drop_block_rate=None,
-        prompt_length=args.length,
-        embedding_key=args.embedding_key,
-        prompt_init=args.prompt_key_init,
-        prompt_pool=args.prompt_pool,
-        prompt_key=args.prompt_key,
-        pool_size=args.size,
-        top_k=args.top_k,
-        batchwise_prompt=args.batchwise_prompt,
-        prompt_key_init=args.prompt_key_init,
-        head_type=args.head_type,
-        use_prompt_mask=args.use_prompt_mask,
     )
-    model = original_model
     original_model.to(device)
     model.to(device)  
 

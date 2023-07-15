@@ -74,7 +74,8 @@ def train_one_epoch(model: torch.nn.Module, original_model: torch.nn.Module,
             sys.exit(1)
 
         optimizer.zero_grad()
-        loss.backward() 
+        loss.backward(retain_graph=True)
+
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
         optimizer.step()
 

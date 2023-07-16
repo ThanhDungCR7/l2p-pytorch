@@ -15,29 +15,27 @@ class Prompt(nn.Module):
         self.pool_size = pool_size
         self.top_k = top_k
         self.batchwise_prompt = batchwise_prompt
-        
-
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         if self.prompt_pool:
             prompt_pool_shape = (pool_size, length, embed_dim)
             if prompt_init == 'zero':
-                self.prompt = nn.Parameter(torch.zeros(prompt_pool_shape, device=self.device))
+                self.prompt = nn.Parameter(torch.zeros(prompt_pool_shape))
             elif prompt_init == 'uniform':
-                self.prompt = nn.Parameter(torch.randn(prompt_pool_shape, device=self.device))
+                self.prompt = nn.Parameter(torch.randn(prompt_pool_shape))
                 nn.init.uniform_(self.prompt, -1, 1)
         
         # if using learnable prompt keys
         if prompt_key:
             key_shape = (pool_size, embed_dim)
             if prompt_key_init == 'zero':
-                self.prompt_key = nn.Parameter(torch.zeros(key_shape, device=self.device))
+                self.prompt_key = nn.Parameter(torch.zeros(key_shape))
             elif prompt_key_init == 'uniform':
-                self.prompt_key = nn.Parameter(torch.randn(key_shape, device=self.device))
+                self.prompt_key = nn.Parameter(torch.randn(key_shape))
+                nn.init.uniform_(self.prompt_key, -1, 1)
         else:
             # else use mean of prompt as key
             # only compatible with prompt, not prefix
-            prompt_mean = torch.mean(self.prompt.clone(), dim=1)
+            prompt_mean = torch.mean(self.prompt, dim=1)
             self.prompt_key = prompt_mean
     
     def l2_normalize(self, x, dim=None, epsilon=1e-12):

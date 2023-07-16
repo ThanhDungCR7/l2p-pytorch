@@ -13,7 +13,6 @@ import random
 import numpy as np
 import time
 import torch
-torch.autograd.set_detect_anomaly(True)
 import torch.backends.cudnn as cudnn
 
 from pathlib import Path
